@@ -12,30 +12,30 @@ const usuariosGet = (req, res) => {
   });
 };
 
-const usuariosPut = (req, res) => {
-  const id = req.params.id;
+const usuariosPut = async (req, res) => {
+  const { id } = req.params;
+  const { password, google, correo, ...resto } = req.body;
+
+  // Validar contra BBDD
+  if (password) {
+    const salt = bcryptjs.genSaltSync();
+    resto.password = bcryptjs.hashSync(password, salt);
+  }
+
+  // findByIdAndUpdate -> busca el ID y actualiza la información, la cual queda guardada en la variable usuario
+  const usuario = await Usuario.findByIdAndUpdate(id, resto);
 
   res.json({
     msg: "put API - Controlador",
-    id,
+    usuario,
   });
 };
 
 const usuariosPost = async (req, res) => {
-  
-
   const { nombre, correo, password, rol } = req.body;
 
   // Creamos una instancia del esquema usuario
   const usuario = new Usuario({ nombre, correo, password, rol });
-
-  // Verificar si el correo existe
-  const existeEmail = await Usuario.findOne({ correo });
-  if (existeEmail) {
-    return res.status(400).json({
-      msg: "Ese correo ya está registrado",
-    });
-  }
 
   // Encriptar la contraseña
   const salt = bcryptjs.genSaltSync();
@@ -45,7 +45,6 @@ const usuariosPost = async (req, res) => {
   usuario.save();
 
   res.json({
-    msg: "post API - Controlador",
     usuario,
   });
 };
