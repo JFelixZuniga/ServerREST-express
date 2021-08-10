@@ -39,7 +39,6 @@ router.post(
       "La contraseña es obligatoria y debe tener más de 6 caracteres."
     ).isLength({ min: 6 }),
     check("correo", "El correo no es válido.").isEmail(),
-    // check("rol", "No es un rol permitido.").isIn(["ADMIN_ROLE", "USER_ROLE"]),
     check("correo").custom(emailExiste),
     check("rol").custom(esRolValido),
     validarCampos,
